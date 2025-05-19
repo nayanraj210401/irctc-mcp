@@ -96,11 +96,43 @@ You can add this MCP to Claude or other MCP-compatible applications by creating 
 
 ### Adding to Claude Desktop
 
-1. Save the above JSON configuration to a file (e.g., `irctc-mcp.json`)
-2. Open Claude Desktop
-3. Go to Settings > Model Context Protocol
-4. Click 'Add Server' and select your JSON configuration file
-5. The IRCTC MCP will now be available in your Claude conversations
+#### macOS:
+1. Open Claude Desktop
+2. Click on "Claude" in the menu bar
+3. Select "Settings" (or "Preferences")
+4. Go to the "Developer" tab
+5. Click on "Edit Config"
+   - This will open the configuration file at: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+#### Windows:
+1. Open Claude Desktop
+2. Click on the hamburger menu (☰) in the top-left corner
+3. Go to "File" > "Settings"
+4. Navigate to the "Developer" tab
+5. Click on "Edit Config"
+   - This will open the configuration file at: `%APPDATA%\Claude\claude_desktop_config.json`
+
+#### Configuration Example:
+Add the following JSON to your Claude Desktop configuration file:
+
+```json
+{
+  "mcpServers": {
+    "irctc": {
+      "command": "node",
+      "args": [
+        "/path/to/irctc-mcp/dist/index.js"
+      ],
+      "env": {
+        "RAPIDAPI_KEY": "your_rapidapi_key_here",
+        "RAPIDAPI_HOST": "irctc1.p.rapidapi.com"
+      }
+    }
+  }
+}
+```
+
+After making changes, completely close and restart Claude Desktop for the changes to take effect.
 
 ### Adding to Claude Web
 
@@ -136,13 +168,30 @@ Check the PNR status for 1234567890
 - `getPnrHistory`: Get booking history for a PNR (placeholder)
 - `checkPnrChartStatus`: Check if the chart has been prepared for a PNR
 
+## RapidAPI Integration
+
+This project uses the [IRCTC API](https://rapidapi.com/IRCTCAPI/api/irctc1) available on RapidAPI. To use this API:
+
+1. Sign up for a free account at [RapidAPI](https://rapidapi.com/)
+2. Subscribe to the [IRCTC API](https://rapidapi.com/IRCTCAPI/api/irctc1)
+3. Get your API key from the RapidAPI dashboard
+
 ## Environment Variables
 
-- `RAPIDAPI_KEY`: Your RapidAPI key
-- `RAPIDAPI_HOST`: RapidAPI host (default: irctc1.p.rapidapi.com)
+- `RAPIDAPI_KEY`: Your RapidAPI key (required)
+- `RAPIDAPI_HOST`: Set to `irctc1.p.rapidapi.com`
 - `PORT`: Server port (default: 3000)
 - `NODE_ENV`: Environment (development/production)
 
+## Credits
+
+If you use this project in your work, we'd appreciate a shoutout! While not required, it helps the project grow and helps others discover it. You can mention it like this:
+
+```
+IRCTC MCP - A Model Context Protocol server for Indian Railway IRCTC API integration
+https://github.com/nayanraj210401/irctc-mcp
+```
+
 ## License
 
-MIT
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details.
