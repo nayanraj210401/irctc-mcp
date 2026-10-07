@@ -1,0 +1,6 @@
+.flow/
+.serena/
+.claude/
+node_modules/
+dist/
+.env
