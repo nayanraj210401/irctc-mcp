@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { createMcpExpressApp } from '@modelcontextprotocol/sdk/server/express.js';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -43,6 +43,16 @@ export function createApp(options: { railkitBaseUrl: string; allowedHosts?: stri
   };
   app.get('/mcp', methodNotAllowed);
   app.delete('/mcp', methodNotAllowed);
+
+  app.use((err: Error & { type?: string }, _req: Request, res: Response, _next: NextFunction) => {
+    const parseError = err.type === 'entity.parse.failed';
+    if (!parseError) console.error(err);
+    res.status(parseError ? 400 : 500).json({
+      jsonrpc: '2.0',
+      error: parseError ? { code: -32700, message: 'Parse error' } : { code: -32603, message: 'Internal error' },
+      id: null,
+    });
+  });
 
   return app;
 }

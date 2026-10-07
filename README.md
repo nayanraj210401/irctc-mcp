@@ -41,7 +41,7 @@ claude mcp add --transport http irctc https://<host>/mcp --header "Authorization
 
 ### Cursor
 
-In `mcp.json`:
+In `mcp.json` (`RAILKIT_API_KEY` is an environment variable on your own machine):
 
 ```json
 {

@@ -2,15 +2,15 @@ import { z, type ZodRawShape } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { RailKit } from './railkit.js';
 
-export type Tool = (server: McpServer, rk: RailKit) => void;
+type Tool = (server: McpServer, rk: RailKit) => void;
 
-export const trainNumber = z.string().regex(/^\d{5}$/).describe('5-digit train number, e.g. 12301');
-export const stationCode = z.string().regex(/^[A-Za-z]{1,5}$/).transform((s) => s.toUpperCase()).describe('Station code, e.g. NDLS');
-export const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe('Date in YYYY-MM-DD format');
+const trainNumber = z.string().regex(/^\d{5}$/).describe('5-digit train number, e.g. 12301');
+const stationCode = z.string().regex(/^[A-Za-z]{1,5}$/).transform((s) => s.toUpperCase()).describe('Station code, e.g. NDLS');
+const date = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe('Date in YYYY-MM-DD format');
 
-export const toRailKitDate = (isoDate: string) => isoDate.split('-').reverse().join('-');
+const toRailKitDate = (isoDate: string) => isoDate.split('-').reverse().join('-');
 
-export function endpoint<S extends ZodRawShape>(
+function endpoint<S extends ZodRawShape>(
   name: string,
   description: string,
   inputSchema: S,

@@ -1,4 +1,5 @@
 import { test, before, after } from 'node:test';
+import { spawn } from 'node:child_process';
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
@@ -12,11 +13,15 @@ let mcp: Server;
 let mcpUrl: URL;
 
 before(async () => {
-  process.env.RAILKIT_API_KEY = 'operator-key-must-never-be-used';
   railkitMock = createServer((req, res) => {
     const key = req.headers['x-api-key'];
     setTimeout(() => {
       res.setHeader('Content-Type', 'application/json');
+      if (key === 'fail-500') {
+        res.statusCode = 500;
+        res.end(JSON.stringify({ success: false, error: 'upstream detail fail-500' }));
+        return;
+      }
       if (key === 'bad-key-secret') {
         res.statusCode = 401;
         res.end(JSON.stringify({ success: false, error: 'Invalid API key' }));
@@ -61,7 +66,45 @@ test('lists the RailKit tools', async () => {
   }
 });
 
-test('rejects a request without a caller key, even when the server env has one', async () => {
+test('the real entry point rejects a keyless request even with RAILKIT_API_KEY in its env', async () => {
+  const port = 30000 + Math.floor(Math.random() * 20000);
+  const entry = spawn(process.execPath, ['--import', 'tsx', 'src/index.ts'], {
+    env: { ...process.env, PORT: String(port), RAILKIT_API_KEY: 'operator-key-must-never-be-used', ALLOWED_HOSTS: '' },
+    stdio: ['ignore', 'ignore', 'pipe'],
+  });
+  try {
+    await new Promise((resolve) => entry.stderr.on('data', (d) => String(d).includes('listening') && resolve(null)));
+    const base = `http://127.0.0.1:${port}`;
+    assert.equal((await fetch(`${base}/health`)).status, 200);
+    const res = await fetch(`${base}/mcp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list' }),
+    });
+    assert.equal(res.status, 401);
+    assert.equal(res.headers.get('www-authenticate'), 'Bearer');
+  } finally {
+    entry.kill();
+  }
+});
+
+test('an upstream 5xx becomes a generic tool error', async () => {
+  const r = await call('fail-500', 'getPnrStatus', { pnrNumber: '1234567890' });
+  assert.equal(r.isError, true);
+  assert.equal(r.text, 'RailKit upstream failure (500).');
+});
+
+test('a malformed body gets a JSON-RPC parse error', async () => {
+  const res = await fetch(mcpUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer k' },
+    body: '{not json',
+  });
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).error.code, -32700);
+});
+
+test('rejects a request without a caller key', async () => {
   const res = await fetch(mcpUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json, text/event-stream' },

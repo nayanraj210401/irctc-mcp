@@ -9,10 +9,11 @@ const STATUS_MESSAGES: Record<number, string> = {
 
 export function railkit(apiKey: string, baseUrl: string): RailKit {
   return async (path) => {
-    const res = await fetch(baseUrl + path, { headers: { 'x-api-key': apiKey } });
+    const res = await fetch(baseUrl + path, { headers: { 'x-api-key': apiKey }, signal: AbortSignal.timeout(15_000) });
     const body = (await res.json().catch(() => null)) as { success?: boolean; error?: string } | null;
     if (!res.ok || !body?.success) {
-      throw new Error(STATUS_MESSAGES[res.status] ?? `RailKit request failed (${res.status}): ${body?.error ?? 'upstream error'}`);
+      if (res.status >= 500) throw new Error(`RailKit upstream failure (${res.status}).`);
+      throw new Error(STATUS_MESSAGES[res.status] ?? `RailKit request failed (${res.status}): ${body?.error ?? 'unknown error'}`);
     }
     const { success, ...rest } = body;
     return rest;
