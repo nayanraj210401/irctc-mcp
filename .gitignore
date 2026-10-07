@@ -26,3 +26,5 @@ Thumbs.db
 .flow/ACTIVE
 .flow/tasks/
 .flow/trail.jsonl
+.serena/
+.claude/worktrees/
