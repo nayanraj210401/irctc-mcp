@@ -4,20 +4,30 @@ A remote MCP server for Indian Railways, built on the [RailKit](https://railkit.
 
 ## Tools
 
-- `searchTrains`: trains between two stations, optionally on a date
-- `checkSeatAvailability`: seat availability, fare, and waitlist prediction
-- `getTrainSchedule`: train details and full route
-- `getLiveTrainStatus`: live running status for a journey date
-- `getPnrStatus`: PNR status and passenger details
+| Tool | What it returns |
+|---|---|
+| `searchStations` | station codes for a name like "Delhi" |
+| `searchTrainsByName` | train numbers for a name like "Rajdhani" |
+| `getStation` | a station's name and coordinates |
+| `searchTrains` | trains between two stations, optionally on a date |
+| `checkSeatAvailability` | seat availability, fare, and waitlist prediction |
+| `getFare` | full fare breakdown |
+| `getTrainSchedule` | train details and full route |
+| `getLiveTrainStatus` | live running status for a journey date |
+| `getTrainHistory` | timeline of a completed journey |
+| `getLiveStation` | trains at a station in the next 2, 4 or 8 hours |
+| `getStationTimetable` | a station's timetable for today, yesterday or tomorrow |
+| `getCancelledTrains` | fully and partially cancelled trains |
+| `getPnrStatus` | PNR status, chart status, and passenger details |
 
-More tools may be added. The authoritative list is what the server returns for `tools/list`.
+Dates are `YYYY-MM-DD`; the server converts them for RailKit.
 
 ## Get a RailKit key
 
 1. Sign in at [railkit.in](https://railkit.in).
 2. Open Dashboard, then API Keys, and create a key.
 
-RailKit's direct REST access requires the **Advance plan**. Free and Pro keys are rejected.
+RailKit's docs say direct REST access requires the **Advance plan**, so expect Free and Pro keys to be rejected.
 
 ## Connect
 
