@@ -3,9 +3,9 @@ id: pnr.status
 title: Check PNR status
 owns: src/tools.ts
 entries: api POST /mcp tools/call getPnrStatus
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/pnr.status.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Check PNR status
 

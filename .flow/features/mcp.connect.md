@@ -3,9 +3,9 @@ id: mcp.connect
 title: Connect with your own RailKit key
 owns: src/app.ts src/index.ts src/railkit.ts test/e2e.test.ts scripts/smoke-live.ts
 entries: api POST /mcp | api GET /health
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/mcp.connect.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Connect with your own RailKit key
 

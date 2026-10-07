@@ -3,9 +3,9 @@ id: trains.track
 title: Track running and past trains
 owns: src/tools.ts
 entries: api POST /mcp tools/call getLiveTrainStatus | api POST /mcp tools/call getTrainHistory | api POST /mcp tools/call getCancelledTrains
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/trains.track.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Track running and past trains
 

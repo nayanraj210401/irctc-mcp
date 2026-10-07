@@ -31,7 +31,7 @@ RailKit's docs say direct REST access requires the **Advance plan**, so expect F
 
 ## Connect
 
-Replace `<host>` with the address of a running server. Send your key as `Authorization: Bearer <key>` or `X-RailKit-Key: <key>`.
+A public instance runs at `https://irctc-mcp-production.up.railway.app/mcp`. Use that as `https://<host>/mcp` below, or self-host. Send your key as `Authorization: Bearer <key>` or `X-RailKit-Key: <key>`.
 
 ### Claude Code
 

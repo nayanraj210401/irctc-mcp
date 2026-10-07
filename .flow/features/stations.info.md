@@ -3,9 +3,9 @@ id: stations.info
 title: Station lookup and boards
 owns: src/tools.ts
 entries: api POST /mcp tools/call searchStations | api POST /mcp tools/call getStation | api POST /mcp tools/call getLiveStation | api POST /mcp tools/call getStationTimetable
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/stations.info.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Station lookup and boards
 

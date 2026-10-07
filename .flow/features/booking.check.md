@@ -3,9 +3,9 @@ id: booking.check
 title: Check seats and fares
 owns: src/tools.ts
 entries: api POST /mcp tools/call checkSeatAvailability | api POST /mcp tools/call getFare
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/booking.check.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Check seats and fares
 

@@ -3,9 +3,9 @@ id: trains.find
 title: Find trains
 owns: src/tools.ts
 entries: api POST /mcp tools/call searchTrains | api POST /mcp tools/call searchTrainsByName | api POST /mcp tools/call getTrainSchedule
-scenario:
-status: unverified
-verified:
+scenario: node --test .claude/skills/verify-irctc-mcp/scenarios/trains.find.test.mjs
+status: verified
+verified: 2026-10-07 2c6650f
 ---
 # Find trains
 
