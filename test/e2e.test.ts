@@ -56,7 +56,7 @@ test('lists the RailKit tools', async () => {
   const client = await connect({ Authorization: 'Bearer k' });
   const { tools } = await client.listTools();
   await client.close();
-  for (const name of ['searchTrains', 'checkSeatAvailability', 'getTrainSchedule', 'getLiveTrainStatus', 'getPnrStatus']) {
+  for (const name of ['searchTrains', 'checkSeatAvailability', 'getTrainSchedule', 'getLiveTrainStatus', 'getPnrStatus', 'searchStations', 'getStation', 'searchTrainsByName', 'getFare', 'getLiveStation', 'getStationTimetable', 'getCancelledTrains', 'getTrainHistory']) {
     assert.ok(tools.some((t) => t.name === name), `missing tool ${name}`);
   }
 });
@@ -87,6 +87,21 @@ test('concurrent callers each reach RailKit with their own key', async () => {
 test('converts YYYY-MM-DD to RailKit DD-MM-YYYY and uppercases station codes', async () => {
   const r = await call('k', 'searchTrains', { source: 'ndls', destination: 'PNBE', date: '2026-10-07' });
   assert.equal(JSON.parse(r.text).data.path, '/api/v1/trains/between/NDLS/PNBE?date=07-10-2026');
+});
+
+test('getFare puts the date before the stations, in DD-MM-YYYY', async () => {
+  const r = await call('k', 'getFare', { trainNumber: '12301', from: 'ndls', to: 'hwh', date: '2026-10-07', classCode: '3A' });
+  assert.equal(JSON.parse(r.text).data.path, '/api/v1/fare/12301/07-10-2026/NDLS/HWH/3A/GN');
+});
+
+test('searchStations URL-encodes the name', async () => {
+  const r = await call('k', 'searchStations', { name: 'New Delhi' });
+  assert.equal(JSON.parse(r.text).data.path, '/api/v1/stations/search?name=New%20Delhi');
+});
+
+test('getLiveStation defaults to 2 hours', async () => {
+  const r = await call('k', 'getLiveStation', { stationCode: 'ndls' });
+  assert.equal(JSON.parse(r.text).data.path, '/api/v1/stations/NDLS/live?hrs=2');
 });
 
 test('an upstream 401 becomes a tool error that does not echo the key', async () => {
