@@ -70,7 +70,7 @@ export const tools: Tool[] = [
   ),
   endpoint(
     'getStation',
-    'Get details for one station by its code: name, zone, state, coordinates',
+    "Get a station's name and coordinates by its code",
     { stationCode },
     (a) => `/api/v1/stations/${a.stationCode}`,
   ),
