@@ -1,0 +1,7 @@
+.dockerignore
+.env.example
+Dockerfile
+package-lock.json
+package.json
+railway.json
+tsconfig.json

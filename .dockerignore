@@ -1,0 +1,6 @@
+node_modules
+dist
+.flow
+.serena
+.git
+.env

@@ -1,187 +1,119 @@
 # IRCTC MCP Server
 
-A Model Context Protocol (MCP) server for IRCTC (Indian Railways) integration using RapidAPI. This server provides tools for searching trains, checking PNR status, and other IRCTC-related functionalities.
+A remote MCP server for Indian Railways, built on the [RailKit](https://railkit.in) REST API. It speaks Streamable HTTP at `POST /mcp`. You bring your own RailKit API key and send it with each request. The server holds no key of its own.
 
-## Features
+## Tools
 
-- Search trains between stations
-- Check seat availability
-- Get train schedules
-- Check PNR status
-- Get live train status
-- Built with TypeScript for type safety
-- Environment-based configuration
+| Tool | What it returns |
+|---|---|
+| `searchStations` | station codes for a name like "Delhi" |
+| `searchTrainsByName` | train numbers for a name like "Rajdhani" |
+| `getStation` | a station's name and coordinates |
+| `searchTrains` | trains between two stations, optionally on a date |
+| `checkSeatAvailability` | seat availability, fare, and waitlist prediction |
+| `getFare` | full fare breakdown |
+| `getTrainSchedule` | train details and full route |
+| `getLiveTrainStatus` | live running status for a journey date |
+| `getTrainHistory` | timeline of a completed journey |
+| `getLiveStation` | trains at a station in the next 2, 4 or 8 hours |
+| `getStationTimetable` | a station's timetable for today, yesterday or tomorrow |
+| `getCancelledTrains` | fully and partially cancelled trains |
+| `getPnrStatus` | PNR status, chart status, and passenger details |
 
-## Prerequisites
+Dates are `YYYY-MM-DD`; the server converts them for RailKit.
 
-- Node.js 18+
-- npm or yarn
-- RapidAPI key for IRCTC API
+## Get a RailKit key
 
-## Setup
+1. Sign in at [railkit.in](https://railkit.in).
+2. Open Dashboard, then API Keys, and create a key.
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd irctc-mcp
-   ```
+RailKit's docs say direct REST access requires the **Advance plan**, so expect Free and Pro keys to be rejected.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+## Connect
 
-3. Copy `.env.example` to `.env` and update with your RapidAPI key:
-   ```bash
-   cp .env.example .env
-   ```
+A public instance runs at `https://irctc-mcp-production.up.railway.app/mcp`. Use that as `https://<host>/mcp` below, or self-host. Send your key as `Authorization: Bearer <key>` or `X-RailKit-Key: <key>`.
 
-4. Build the project:
-   ```bash
-   npm run build
-   ```
+### Claude Code
 
-## Running the Server
-
-### Development Mode
 ```bash
-npm run dev
+claude mcp add --transport http irctc https://<host>/mcp --header "Authorization: Bearer <your-railkit-key>"
 ```
 
-### Production Mode
-```bash
-npm run build
-npm start
-```
+### Cursor
 
-## Using the MCP in Your Applications
-
-### Adding to Cascade
-
-To add the IRCTC MCP to Cascade, you need to update your MCP configuration file located at `~/.codeium/windsurf/mcp_config.json`:
+In `mcp.json` (`RAILKIT_API_KEY` is an environment variable on your own machine):
 
 ```json
 {
   "mcpServers": {
     "irctc": {
-      "command": "node",
-      "args": [
-        "/path/to/irctc-mcp/dist/index.js"
-      ],
-      "env": {
-        "RAPIDAPI_KEY": "your_rapidapi_key_here",
-        "RAPIDAPI_HOST": "irctc1.p.rapidapi.com"
-      }
+      "url": "https://<host>/mcp",
+      "headers": { "Authorization": "Bearer ${env:RAILKIT_API_KEY}" }
     }
   }
 }
 ```
 
-Replace `/path/to/irctc-mcp` with the actual path to your project directory and update the `RAPIDAPI_KEY` with your actual API key.
+### Windsurf
 
-### Adding to Claude or Other MCP-Compatible Applications
-
-You can add this MCP to Claude or other MCP-compatible applications by creating a JSON configuration file:
-
-```json
-{
-  "name": "IRCTC MCP",
-  "description": "MCP server for IRCTC integration with RapidAPI",
-  "transport": {
-    "type": "http",
-    "url": "http://localhost:3000"
-  }
-}
-```
-
-### Adding to Claude Desktop
-
-#### macOS:
-1. Open Claude Desktop
-2. Click on "Claude" in the menu bar
-3. Select "Settings" (or "Preferences")
-4. Go to the "Developer" tab
-5. Click on "Edit Config"
-   - This will open the configuration file at: `~/Library/Application Support/Claude/claude_desktop_config.json`
-
-#### Windows:
-1. Open Claude Desktop
-2. Click on the hamburger menu (☰) in the top-left corner
-3. Go to "File" > "Settings"
-4. Navigate to the "Developer" tab
-5. Click on "Edit Config"
-   - This will open the configuration file at: `%APPDATA%\Claude\claude_desktop_config.json`
-
-#### Configuration Example:
-Add the following JSON to your Claude Desktop configuration file:
+In `mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
     "irctc": {
-      "command": "node",
-      "args": [
-        "/path/to/irctc-mcp/dist/index.js"
-      ],
-      "env": {
-        "RAPIDAPI_KEY": "your_rapidapi_key_here",
-        "RAPIDAPI_HOST": "irctc1.p.rapidapi.com"
-      }
+      "serverUrl": "https://<host>/mcp",
+      "headers": { "Authorization": "Bearer <your-railkit-key>" }
     }
   }
 }
 ```
 
-After making changes, completely close and restart Claude Desktop for the changes to take effect.
+### claude.ai and Claude Desktop
 
-### Adding to Claude Web
+Add a custom connector pointing at `https://<host>/mcp`.
 
-1. Save the above JSON configuration to a file (e.g., `irctc-mcp.json`)
-2. In Claude Web, click on the '+' button in the sidebar
-3. Select 'Add MCP Server' and upload your JSON configuration file
-4. The IRCTC MCP will now be available in your Claude conversations
+TODO (maintainer): it is unverified how claude.ai sends a static API key to a custom connector. Test this and document the working setup, or add a supported auth flow.
 
-### Example Usage in Claude
+## Privacy
 
-Once connected, you can ask Claude to use the IRCTC MCP with prompts like:
+The server never stores or logs your key. Every request uses only the key sent with that request.
 
-```
-Can you search for trains from NDLS to PNBE on 2023-12-25?
-```
+## Self-host and develop
 
-Or:
+Requires Node 18+.
 
-```
-Check the PNR status for 1234567890
+```bash
+npm install
+npm run dev          # watch mode on http://localhost:3000
+npm test
+npm run smoke:live   # live check against RailKit
 ```
 
-## Available Tools
+Environment variables (see `.env.example`):
 
-### Train Tools
-- `searchTrains`: Search for trains between two stations
-- `checkSeatAvailability`: Check seat availability for a specific train
-- `getTrainSchedule`: Get the complete schedule of a train
-- `getLiveTrainStatus`: Get live status of a running train
+- `PORT`: listen port (default `3000`)
+- `RAILKIT_BASE_URL`: RailKit API base (default `https://api.railkit.in`)
+- `ALLOWED_HOSTS`: optional comma-separated Host header allowlist
 
-### PNR Tools
-- `getPnrStatus`: Get the current status of a PNR
-- `getPnrHistory`: Get booking history for a PNR (placeholder)
-- `checkPnrChartStatus`: Check if the chart has been prepared for a PNR
+The server does not read a RailKit key from the environment.
 
-## RapidAPI Integration
+Health check: `GET /health`.
 
-This project uses the [IRCTC API](https://rapidapi.com/IRCTCAPI/api/irctc1) available on RapidAPI. To use this API:
+### Docker
 
-1. Sign up for a free account at [RapidAPI](https://rapidapi.com/)
-2. Subscribe to the [IRCTC API](https://rapidapi.com/IRCTCAPI/api/irctc1)
-3. Get your API key from the RapidAPI dashboard
+```bash
+docker build -t irctc-mcp .
+docker run -p 3000:3000 irctc-mcp
+```
 
-## Environment Variables
+### Railway
 
-- `RAPIDAPI_KEY`: Your RapidAPI key (required)
-- `RAPIDAPI_HOST`: Set to `irctc1.p.rapidapi.com`
-- `PORT`: Server port (default: 3000)
-- `NODE_ENV`: Environment (development/production)
+Deploy the repo on Railway. `railway.json` selects the Dockerfile and the `/health` check. Set `ALLOWED_HOSTS` to your public domain if you want Host header checking.
+
+## Older local version
+
+The previous local stdio version lives on the `backup/local-stdio` branch.
 
 ## Credits
 

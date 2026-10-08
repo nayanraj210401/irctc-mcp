@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "commands": {
+    "test": "npm test",
+    "lint": "",
+    "typecheck": "npx tsc --noEmit",
+    "run": "npm run dev"
+  },
+  "ready": [],
+  "hooks": {}
+}
