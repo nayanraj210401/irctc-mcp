@@ -109,7 +109,7 @@ docker run -p 3000:3000 irctc-mcp
 
 ### Railway
 
-Deploy the repo on Railway. `railway.json` selects the Dockerfile and the `/health` check. Set `ALLOWED_HOSTS` to your public domain if you want Host header checking.
+Deploy the repo on Railway. `.railway/railway.ts` selects the Dockerfile and the `/health` check; the restart policy is Railway's default (on failure, 10 retries). Set `ALLOWED_HOSTS` to your public domain if you want Host header checking.
 
 ## Older local version
 
